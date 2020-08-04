@@ -16,6 +16,7 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
 
+import org.hibernate.annotations.GeneratorType;
 import org.hibernate.validator.constraints.UniqueElements;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -25,14 +26,6 @@ public class User {
 	@Id
 	@GeneratedValue
 	private int id;
-	public String getConformPassword() {
-		return conformPassword;
-	}
-
-	public void setConformPassword(String conformPassword) {
-		this.conformPassword = conformPassword;
-	}
-
 	private String firstName;
 	private String lastName;
 	private String password;
@@ -128,7 +121,13 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-	
+	public String getConformPassword() {
+		return conformPassword;
+	}
+
+	public void setConformPassword(String conformPassword) {
+		this.conformPassword = conformPassword;
+	}
 	
 	
 	
