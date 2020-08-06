@@ -15,31 +15,35 @@ import com.cts.repository.UserRepository;
 @RestController
 @RequestMapping("/demo")
 public class demo {
-	
+
 	@Autowired
 	private UserRepository repo;
-	
+
+	@Autowired
+	private DemoServiceProxy proxy;
+
+	@RequestMapping("/feign")
+	public String getAsll() {
+	return proxy.get();
+	}
+
 //	@Autowired
 //	private NoOpPasswordEncoder passwordEncoder;
-	
+
 	@GetMapping("/get")
 	public String get() {
 		return "demo working";
 	}
-	
+
 	@PostMapping("/add")
 	public ResponseEntity<?> addUser(@RequestBody User user) {
-		if(user.getPassword().equals(user.getConformPassword()))
-		{
+		if (user.getPassword().equals(user.getConformPassword())) {
 			repo.save(user);
 			return ResponseEntity.status(HttpStatus.CREATED).build();
-		}
-		else {
+		} else {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
 		}
-		
-					
-		  
+
 	}
 
 }

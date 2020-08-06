@@ -4,6 +4,8 @@ import java.security.Principal;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,6 +32,14 @@ public class UserRegistrationController {
 //	@Autowired
 //	private NoOpPasswordEncoder passwordEncoder;
  
+	@Autowired
+	private DemoServiceProxy proxy;
+
+	@RequestMapping("/feign")
+	public String getAsll() {
+	return proxy.get();
+	}
+
 	
 	
 	@GetMapping("/all")
@@ -37,8 +47,16 @@ public class UserRegistrationController {
 		return repo.findAll();
 	}
 	@GetMapping("/bank/{pan}")
-	public List<BankAccount> getBank(@PathVariable String pan){
-		return dao.findAllByPan(pan);
+	public ResponseEntity<List<BankAccount>> getBank(@PathVariable String pan,Principal principal){
+		String username=principal.getName();
+		if(username.equals(pan)) {
+			List<BankAccount> accounts= dao.findAllByPan(pan);
+			return new ResponseEntity<List<BankAccount>>(accounts,HttpStatus.OK);
+		}
+		else {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+		}
+
 	}
 	
 	@PostMapping("/addBank")
