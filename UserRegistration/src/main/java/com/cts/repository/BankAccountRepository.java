@@ -20,6 +20,10 @@ public interface BankAccountRepository extends JpaRepository<BankAccount, Intege
 	@Query(value = "SELECT count(pan) FROM BankAccount where pan = :pan")
 	Integer countByPan(@Param("pan") String pan);
 
+	boolean existsByBankAccount(String bankAccount);
+	
+	
+
 }
 	
 
