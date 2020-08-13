@@ -1,55 +1,104 @@
 package com.cts.entity;
 
 
-import java.util.Date;
-import java.util.Set;
+import java.time.LocalDate;
 
-import javax.persistence.CascadeType;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.persistence.Transient;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;
 import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.GeneratorType;
 import org.hibernate.validator.constraints.UniqueElements;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+/**
+ * 
+ * @author 844226 - mahesh 
+ * @implNote user Entity
+ *
+ */
+
+@ApiModel(description = "This is the user entity")
 @Entity
 public class User {
+	
+	@ApiModelProperty(value = "A unique key for each USER")
 	@Id
 	@GeneratedValue
 	private int id;
+	
+	@ApiModelProperty(value = "FirstName of the user")
+	@NotNull(message = "Name cannot be null")
+	@Pattern(regexp = "^[a-zA-Z]+$",message = "firstname shold be in alphabetsonly")
+	@Size(min = 2, message = "firstname must have atleast 2 characters")
 	private String firstName;
+	
+	@ApiModelProperty(value = "lastName of the user")
+	@NotNull(message = "lastName cannot be null")
+	@Pattern(regexp = "[a-zA-Z]{2}[A-Za-z\\s]*", message = "lastname can only have alphabets with minimum length 2")
+	@Size(min = 2, message = "firstname must have atleast 2 characters")
 	private String lastName;
+	
+	@ApiModelProperty(value = "password of user")
+	@NotNull(message = "password cannot be null")
+	@Pattern(regexp = "[a-zA-Z0-9]{4}[A-Za-z0-9\\s]*", message = "password  minimum length is 4")
+	@Size(min = 4, message = "firstname must have atleast 4 characters")
 	private String password;
+	
+	@ApiModelProperty(value = "conformPassword of user")
+	@NotNull(message = "conformPassword cannot be null")
+	@Pattern(regexp = "[a-zA-Z0-9]{4}[A-Za-z0-9\\s]*", message = "conformPassword   minimum length is 4")
+	@Size(min = 4, message = "conformPassword must have atleast 4 characters")
 	private String conformPassword;
-//	@Email
+	
+	@ApiModelProperty(value = "email of user")
+	@Email(message="Pls provide a valid email address ")
+    @Pattern(regexp=".+@.+\\..+", message="Please provide a valid email address")
 	private String email;	
-//	@Pattern(regexp = "[1-9]{1}[0-9]{9}")
+	
+	@ApiModelProperty(value = "contactNumber of user")
+	@Pattern(regexp="(^[1-9]{1}[0-9]{9}$)",message = "mobile number should not start with '0'.and it should contains 10 digits")
 	private String contactNumber;
 	
-//	@UniqueElements
-//	@Pattern(regexp = "[A-Z]{5}[0-9]{4}[A-Z]{1}")
+	@ApiModelProperty(value = "pan number of user and it should be unique")
+	@Column(unique = true)	
+	@Pattern(regexp="(^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$)",message = "pan number format is not correct")
 	private String pan;
 	
-//	@Past(message = "date is should not be future")
-	@JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM/dd/yyyy")
-//	@JsonFormat(pattern="yyyy-MM-dd")
-	private Date DOB;
+	@ApiModelProperty(value = "date of birth of user")
+	@JsonFormat(pattern="MM-dd-yyyy")
+//	@Pattern(regexp = "(^(1[0-2]|0[1-9]).(3[01]|[12][0-9]|0[1-9]).[0-9]{4}$)",message = "date format should be in format of MM-dd-yyy.")
+	@Past(message ="DOB should be in past")
+    private LocalDate birthday;
 	
-	@OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-	@JoinTable(name = "user_role", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
-	private Set<Role> roles;
-	
-	
+	@Transient 
+	private int age;
 
+	public int getAge() {
+		return age;
+	}
+
+	public void setAge(int age) {
+		this.age = age;
+	}
+
+	@JsonIgnore
+	private String role;
+	
 	public int getId() {
 		return id;
 	}
@@ -106,21 +155,24 @@ public class User {
 		this.pan = pan;
 	}
 
-	public Date getDOB() {
-		return DOB;
+	
+
+	public LocalDate getBirthday() {
+		return birthday;
 	}
 
-	public void setDOB(Date dOB) {
-		DOB = dOB;
+	public void setBirthday(LocalDate birthday) {
+		this.birthday = birthday;
 	}
 
-	public Set<Role> getRoles() {
-		return roles;
+	public String getRole() {
+		return role;
 	}
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
+	public void setRole(String role) {
+		this.role = role;
 	}
+	
 	public String getConformPassword() {
 		return conformPassword;
 	}
@@ -128,6 +180,7 @@ public class User {
 	public void setConformPassword(String conformPassword) {
 		this.conformPassword = conformPassword;
 	}
+
 	
 	
 	
