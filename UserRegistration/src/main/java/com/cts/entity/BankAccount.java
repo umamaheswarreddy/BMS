@@ -20,6 +20,7 @@ public class BankAccount {
 	@ApiModelProperty(value = "A unique key for each USER")
 	@Id
 	@GeneratedValue
+	@JsonIgnore
 	private int bid;
 	
 	@ApiModelProperty(value = "bankAccount of the user")
@@ -48,6 +49,24 @@ public class BankAccount {
 	private String pan;
 	
 	
+	
+	public BankAccount() {
+		super();
+	}
+	public BankAccount(int bid,
+			@NotNull(message = "bankAccount should not be null") @Pattern(regexp = "(^[0-9]{10}$)", message = "bankAccount should contain 10 digits") String bankAccount,
+			@NotNull(message = "ifscCode name should not be null") @Pattern(regexp = "^[A-Z]{4}0[A-Z0-9]{6}$", message = "ifscCode is an 11-digit alpha-numeric code used to uniquely identify bank.") String ifscCode,
+			@NotNull(message = "bank name should not be null") @Pattern(regexp = "(^[a-zA-Z]+$)", message = "bankName should be in alphabets") String bankName,
+			@NotNull(message = "micrCode name should not be null") @Pattern(regexp = "(^[0-9]{9}$)", message = "MICR code is a 9-digit code that uniquely identifies the bank and branch") String micrCode,
+			String pan) {
+		super();
+		this.bid = bid;
+		this.bankAccount = bankAccount;
+		this.ifscCode = ifscCode;
+		this.bankName = bankName;
+		this.micrCode = micrCode;
+		this.pan = pan;
+	}
 	public String getBankAccount() {
 		return bankAccount;
 	}
@@ -77,6 +96,11 @@ public class BankAccount {
 	}
 	public void setPan(String pan) {
 		this.pan = pan;
+	}
+	@Override
+	public String toString() {
+		return "BankAccount [bid=" + bid + ", bankAccount=" + bankAccount + ", ifscCode=" + ifscCode + ", bankName="
+				+ bankName + ", micrCode=" + micrCode + ", pan=" + pan + "]";
 	}
 	
 	
