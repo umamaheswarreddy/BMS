@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
@@ -20,6 +21,9 @@ import com.example.demo.entity.MutualFund;
 import com.example.demo.exceptions.InvestmentNotFoundException;
 import com.example.demo.repository.InvestMentRepository;
 import com.example.demo.repository.MutualFundRepository;
+import com.example.demo.service.DemoService;
+import com.example.demo.service.InvestMentService;
+import com.example.demo.service.MutualFundService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -33,16 +37,31 @@ import io.swagger.annotations.ApiOperation;
 public class InvestMentController {
 
 	@Autowired
-	private InvestMentRepository repo;
+	private InvestMentService service;
 
 	@Autowired
-	private MutualFundRepository dao;
-
-	@Autowired
-	private UserRegistrationServiceProxy proxy;
+	private MutualFundService mService;
 
 	@Autowired
 	DemoController controller;
+	
+//	@Autowired
+//	DemoService Dservice;
+	
+
+	@GetMapping("/TotalInvestmentByPan/{pan}")
+	public String totalSummary(@PathVariable String pan) {
+		List<Investment> investments = service.findAllByPan(pan);
+		Integer total = investments.stream().map(Investment::getAmountToInvest).mapToInt(Integer::valueOf).sum();
+		return "Total Invest By " + pan + " is " + total;
+	}
+	
+	@GetMapping("/TotalInvestmentByPanAndAccountNumber/pan/{pan}/accountNumber/{accountNumber}")
+	public List<Investment> GetAllTransationsBUPanAndAMount(@PathVariable String pan, @PathVariable String accountNumber ){
+		List<Investment> investments = service.findAllByPan(pan);
+		return investments.stream().filter(invest ->invest.getAccountNumber().equals(accountNumber)).collect(Collectors.toList());
+				
+	}
 
 	/**
 	 * 
@@ -54,7 +73,7 @@ public class InvestMentController {
 		String userName = controller.currentUserName();
 		investment.setPan(userName);
 		investment.setTimestamp(new Date());
-		repo.save(investment);
+		service.save(investment);
 		return ResponseEntity.status(HttpStatus.CREATED).build();
 
 	}
@@ -67,46 +86,16 @@ public class InvestMentController {
 	@ApiOperation(value = "Retrieve a Investment  details based on pan", produces = "A Investment details if it exists", notes = "Hit this URL to get a Investment details")
 	@GetMapping("/getTransactions/{pan}")
 	public List<Investment> GetAllTransactionsByPan(@PathVariable String pan) {
-		List<Investment> investment = repo.findAllByPan(pan);
-		if(!controller.currentUserName().equals(pan)) {
+		List<Investment> investment = service.findAllByPan(pan);
+		if (!controller.currentUserName().equals(pan)) {
 			throw new InvestmentNotFoundException("you are not allowed to see others transaction details");
-		}
-		else if (investment.isEmpty()) {
+		} else if (investment.isEmpty()) {
 			throw new InvestmentNotFoundException("no transactions to show pls invest in mutual funds");
 		} else {
-			for (Investment invest : investment) {
+			investment.forEach(invest -> {
 				invest.setTimeStamp(invest.getTimestamp());
-				MutualFund Mf = dao.findById(invest.getMutualFundId()).orElse(null);
-				invest.setMutulFund(Mf);
-			}
-			return investment;
-		}
-	}
-
-//	@GetMapping("/getTransaction/{iId}")
-//	public Investment findByInvestmentId(@PathVariable int iId){
-//		Investment investment = repo.findById(iId).orElse(null);
-//		MutualFund Mf = dao.findById(investment.getMutualFundId()).orElse(null);
-//		investment.setMutulFund(Mf);
-//		
-//		return investment;
-//	}
-
-	/**
-	 * 
-	 * @param pan- pan
-	 * @param iId  - investmentId
-	 * @return list of transactions
-	 */
-	@ApiOperation(value = "Retrieve a Investment  details based on pan and investmentId", produces = "A Investment details if it exists", notes = "Hit this URL to get a Investment details")
-	@GetMapping("/getTransaction/pan/{pan}/id/{iId}")
-	public Investment findByInvestmentid(@PathVariable String pan, @PathVariable int iId) {
-		Investment investment = repo.findByPanANDIId(pan, iId).orElse(null);
-		if (investment.equals(null)) {
-			throw new InvestmentNotFoundException("no transactions to show on this pan and investmentid");
-		} else {
-			MutualFund Mf = dao.findById(investment.getMutualFundId()).orElse(null);
-			investment.setMutulFund(Mf);
+				invest.setMutulFund(mService.findById(invest.getMutualFundId()));
+			});
 			return investment;
 		}
 	}
@@ -121,15 +110,14 @@ public class InvestMentController {
 	@GetMapping("/getTransaction/pan/{pan}/mutualFundid/{MutualFundId}")
 	public List<Investment> findInvestmentByPanANDMutualFundId(@PathVariable String pan,
 			@PathVariable int MutualFundId) {
-		List<Investment> investments = repo.findAllByPanANDMutualFundId(pan, MutualFundId);
+		List<Investment> investments = service.findAllByPanANDMutualFundId(pan, MutualFundId);
 		if (investments.isEmpty()) {
 			throw new InvestmentNotFoundException("no investments to show for entered pan and mutualfundId ");
 		} else {
-			for (Investment invest : investments) {
+			investments.forEach(invest -> {
 				invest.setTimeStamp(invest.getTimestamp());
-				MutualFund mf = dao.findById(MutualFundId).orElse(null);
-				invest.setMutulFund(mf);
-			}
+				invest.setMutulFund(mService.findById(MutualFundId));
+			});
 			return investments;
 		}
 	}
@@ -143,17 +131,34 @@ public class InvestMentController {
 	@GetMapping("/getAllTransaction/MutualFundId/{MutualFundId}")
 	public List<Investment> findAllTransactionDetailsForParticularFund(@PathVariable int MutualFundId) {
 
-		List<Investment> investments = repo.findAllByMutualFundId(MutualFundId);
+		List<Investment> investments = service.findAllByMutualFundId(MutualFundId);
 		if (investments.isEmpty()) {
 			throw new InvestmentNotFoundException("please enter valid MutualFundId");
 		} else {
-			for (Investment invest : investments) {
+			investments.forEach(invest -> {
 				invest.setTimeStamp(invest.getTimestamp());
-				MutualFund mf = dao.findById(MutualFundId).orElse(null);
-				invest.setMutulFund(mf);
-			}
+				invest.setMutulFund(mService.findById(MutualFundId));
+			});
 			return investments;
 		}
 	}
+
+//	/**
+//	 * 
+//	 * @param pan- pan
+//	 * @param iId  - investmentId
+//	 * @return list of transactions
+//	 */
+//	@ApiOperation(value = "Retrieve a Investment  details based on pan and investmentId", produces = "A Investment details if it exists", notes = "Hit this URL to get a Investment details")
+//	@GetMapping("/getTransaction/pan/{pan}/id/{iId}")
+//	public Investment findByInvestmentid(@PathVariable String pan, @PathVariable int iId) {
+//		Investment investment = repo.findByPanANDIId(pan, iId).orElse(null);
+//		if (investment.equals(null)) {
+//			throw new InvestmentNotFoundException("no transactions to show on this pan and investmentid");
+//		} else {
+//			MutualFund Mf = dao.findById(investment.getMutualFundId()).orElse(null);
+//			investment.setMutulFund(Mf);
+//			return investment;
+//		}
 
 }

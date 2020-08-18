@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.demo.entity.MutualFund;
 import com.example.demo.exceptions.InvestmentNotFoundException;
 import com.example.demo.repository.MutualFundRepository;
+import com.example.demo.service.MutualFundService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -20,7 +21,7 @@ import io.swagger.annotations.ApiOperation;
 public class MutualFundController {
 	
 	@Autowired
-	private MutualFundRepository repo;
+	private MutualFundService sevice;
 	
 	 Logger logger = LoggerFactory.getLogger(MutualFundController.class);
 
@@ -30,7 +31,7 @@ public class MutualFundController {
 	@ApiOperation(value = "list of all a mutualFunds", consumes = "application/json", notes = "Hit this URL to show all mutualFunds")
 	@GetMapping("/all")
 	public List<MutualFund> getAllMutualFunds(){
-		List<MutualFund> mutualFunds= repo.findAll();
+		List<MutualFund> mutualFunds= sevice.findAll();
 		if(mutualFunds.isEmpty()) {
 			logger.error("no mutual funds to show");
 			throw new InvestmentNotFoundException("no mutual funds to show");
