@@ -32,7 +32,7 @@ public class Investment {
 	
 	@ApiModelProperty(value = "A MutualFundId  for  Investment")
 	@NotNull(message = "MutualFundId cannot be null")
-	@Range(min = 1,max = 3,message = "MutualFundId should be in 1 to 2 ")
+//	@Range(min = 1,max = 3,message = "MutualFundId should be in 1 to 2 ")
 	private int MutualFundId;
 	
 	@ApiModelProperty(value = "A accountNumber  for  Investment")
@@ -42,8 +42,8 @@ public class Investment {
 	
 	@ApiModelProperty(value = "A amountToInvest  for  Investment")
 	@NotNull(message = "enter amount To Invest")
-	@Range(min = 10,max = 99,message = "amount should be in range of 01 to 99")
-	private int amountToInvest;
+	@Pattern(regexp = "(^0[1-9]|[1-9]{2}$)", message = "Amount field should accept two decimal number only.and dont enter 00rs")
+	private String amountToInvest;
 	
 	@JsonIgnore
 	private Date timestamp;
@@ -57,6 +57,22 @@ public class Investment {
 	@Transient
 	private MutualFund mutulFund;
 	
+	public Investment() {
+		super();
+	}
+	public Investment(int iId,
+			@NotNull(message = "MutualFundId cannot be null") @Range(min = 1, max = 3, message = "MutualFundId should be in 1 to 2 ") int mutualFundId,
+			@NotNull(message = "bankAccount should not be null") @Pattern(regexp = "(^[0-9]{10}$)", message = "bankAccount should contain 10 digits") String accountNumber,
+			@NotNull(message = "enter amount To Invest") @Pattern(regexp = "(^[0-9]{2}$)", message = "Amount field should accept two decimal number only.") String amountToInvest,
+			Date timestamp, String pan) {
+		super();
+		this.iId = iId;
+		MutualFundId = mutualFundId;
+		this.accountNumber = accountNumber;
+		this.amountToInvest = amountToInvest;
+		this.timestamp = timestamp;
+		this.pan = pan;
+	}
 	public Date getTimeStamp() {
 		return timeStamp;
 	}
@@ -88,10 +104,10 @@ public class Investment {
 	public void setAccountNumber(String accountNumber) {
 		this.accountNumber = accountNumber;
 	}
-	public int getAmountToInvest() {
+	public String getAmountToInvest() {
 		return amountToInvest;
 	}
-	public void setAmountToInvest(int amountToInvest) {
+	public void setAmountToInvest(String amountToInvest) {
 		this.amountToInvest = amountToInvest;
 	}
 	public Date getTimestamp() {

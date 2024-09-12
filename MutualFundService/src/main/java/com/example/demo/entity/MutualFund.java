@@ -14,8 +14,16 @@ public class MutualFund {
 	private String MutualFundName;
 	
 	
-	
-	
+
+	public MutualFund() {
+		super();
+	}
+
+	public MutualFund(int mId, String mutualFundName) {
+		super();
+		this.mId = mId;
+		MutualFundName = mutualFundName;
+	}
 
 	public int getmId() {
 		return mId;

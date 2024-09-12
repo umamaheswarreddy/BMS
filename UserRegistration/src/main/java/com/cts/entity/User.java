@@ -87,6 +87,33 @@ public class User {
 	
 	@Transient 
 	private int age;
+	
+	
+
+	public User() {
+		super();
+	}
+
+	public User(int id,
+			@NotNull(message = "Name cannot be null") @Pattern(regexp = "^[a-zA-Z]+$", message = "firstname shold be in alphabetsonly") @Size(min = 2, message = "firstname must have atleast 2 characters") String firstName,
+			@NotNull(message = "lastName cannot be null") @Pattern(regexp = "[a-zA-Z]{2}[A-Za-z\\s]*", message = "lastname can only have alphabets with minimum length 2") @Size(min = 2, message = "firstname must have atleast 2 characters") String lastName,
+			@NotNull(message = "password cannot be null") @Pattern(regexp = "[a-zA-Z0-9]{4}[A-Za-z0-9\\s]*", message = "password  minimum length is 4") @Size(min = 4, message = "firstname must have atleast 4 characters") String password,
+			@NotNull(message = "conformPassword cannot be null") @Pattern(regexp = "[a-zA-Z0-9]{4}[A-Za-z0-9\\s]*", message = "conformPassword   minimum length is 4") @Size(min = 4, message = "conformPassword must have atleast 4 characters") String conformPassword,
+			@Email(message = "Pls provide a valid email address ") @Pattern(regexp = ".+@.+\\..+", message = "Please provide a valid email address") String email,
+			@Pattern(regexp = "(^[1-9]{1}[0-9]{9}$)", message = "mobile number should not start with '0'.and it should contains 10 digits") String contactNumber,
+			@Pattern(regexp = "(^[A-Za-z]{5}[0-9]{4}[A-Za-z]{1}$)", message = "pan number format is not correct") String pan,
+			@Past(message = "DOB should be in past") LocalDate birthday) {
+		super();
+		this.id = id;
+		this.firstName = firstName;
+		this.lastName = lastName;
+		this.password = password;
+		this.conformPassword = conformPassword;
+		this.email = email;
+		this.contactNumber = contactNumber;
+		this.pan = pan;
+		this.birthday = birthday;
+	}
 
 	public int getAge() {
 		return age;

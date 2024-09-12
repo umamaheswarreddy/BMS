@@ -30,6 +30,7 @@ import com.cts.model.Investment;
 import com.cts.model.MutualFund;
 import com.cts.repository.BankAccountRepository;
 import com.cts.repository.UserRepository;
+import com.cts.service.LoginService;
 
 import io.swagger.annotations.ApiOperation;
 
@@ -45,58 +46,9 @@ import io.swagger.annotations.ApiOperation;
 public class LoginController {
 
 	@Autowired
-	private UserRepository repo;
-	@Autowired
-	private BankAccountRepository dao;
+	private LoginService service;
 
-//	@Autowired
-//	private NoOpPasswordEncoder passwordEncoder;
-	
-	@Autowired
-	private DemoServiceProxy proxy;
-	
-	 Logger logger = LoggerFactory.getLogger(LoginController.class);
-
-	@PostMapping("/feign/invest")
-//	public void addInvest(@RequestBody Investment investment,Principal principal) {
-//		proxy.addInvest(investment, principal);
-//	}
-
-	
-	@RequestMapping("/test")
-	public String test() {
-		return "testing";
-	}
-
-	@RequestMapping("/feign")
-	public String getAsll() {
-		return proxy.get();
-	}
-
-	@RequestMapping("/feign/mutualFunds/all")
-	public List<MutualFund> getAllMutualFunds() {
-		return proxy.getAllMutualFunds();
-	}
-
-	@GetMapping("/feign/getTransaction/{iId}")
-	public Investment findByInvestmentid(@PathVariable int iId, Principal principal) {
-
-		Investment invst = proxy.findByInvestmentid(iId);
-		invst.setPan(principal.getName());
-		return invst;
-	}
-
-	@GetMapping("/all")
-	public List<User> getAll() {
-		List<User> users = repo.findAll();
-		LocalDate today = LocalDate.now();
-		for (User user : users) {
-			LocalDate dob = user.getBirthday();
-			Period p = Period.between(dob, today);
-			user.setAge(p.getYears());
-		}
-		return users;
-	}
+	Logger logger = LoggerFactory.getLogger(LoginController.class);
 
 	/**
 	 * 
@@ -114,7 +66,7 @@ public class LoginController {
 			throw new CustomerNotFoundException("you are not allowed to access other user account details");
 		} else 
 		{
-			List<BankAccount> accounts = dao.findAllByPan(pan);
+			List<BankAccount> accounts = service.findAllByPan(pan);
 			if (accounts.isEmpty()) {
 				logger.error("you have no accounts to show. please setup account");
 				throw new CustomerNotFoundException("you have no accounts to show. please setup account ");
@@ -138,9 +90,9 @@ public class LoginController {
 	public ResponseEntity<?> addbank(@Valid @RequestBody BankAccount account, Principal principal) {
 
 		String username = principal.getName();
-		int count = dao.countByPan(username);
+		int count = service.countByPan(username);
 
-		if (dao.existsByBankAccount(account.getBankAccount())) {
+		if (service.existsByBankAccount(account.getBankAccount())) {
 			logger.error("duplicate Account number");
 			throw new DupicatesException("duplicate Account number");
 		}
@@ -150,7 +102,7 @@ public class LoginController {
 			throw new DupicatesException("user able to setup at least one and at most four Bank accounts");
 		} else {
 			account.setPan(username);
-			dao.save(account);
+			service.save(account);
 			logger.info("new account added successfully");
 			return ResponseEntity.status(HttpStatus.CREATED).build();
 		}
@@ -161,21 +113,55 @@ public class LoginController {
 	public String currentUserName(Principal principal) {
 
 		String username = principal.getName();
-		int count = dao.countByPan(username);
-		System.out.println(count + "------------------------------------------------");
+		int count = service.countByPan(username);
 		return username + " " + count;
 	}
 
-	@GetMapping("/{id}")
-	public User getuser(@PathVariable int id) {
-		User user = repo.findById(id).orElse(null);
-		LocalDate today = LocalDate.now();
-		LocalDate dob = user.getBirthday();
-		Period p = Period.between(dob, today);
-		System.out.println(p + "..................................");
-		int age = p.getYears();
-		user.setAge(age);
-		return user;
-	}
+//	@GetMapping("/{id}")
+//	public User getuser(@PathVariable int id) {
+//		User user = repo.findById(id).orElse(null);
+//		LocalDate today = LocalDate.now();
+//		LocalDate dob = user.getBirthday();
+//		Period p = Period.between(dob, today);
+//		int age = p.getYears();
+//		user.setAge(age);
+//		return user;
+//	}
+	
+//	@RequestMapping("/feign")
+//	public String getAsll() {
+//		return proxy.get();
+//	}
+
+//	@RequestMapping("/feign/mutualFunds/all")
+//	public List<MutualFund> getAllMutualFunds() {
+//		return proxy.getAllMutualFunds();
+//	}
+//
+//	@GetMapping("/feign/getTransaction/{iId}")
+//	public Investment findByInvestmentid(@PathVariable int iId, Principal principal) {
+//
+//		Investment invst = proxy.findByInvestmentid(iId);
+//		invst.setPan(principal.getName());
+//		return invst;
+//	}
+
+//	@GetMapping("/all")
+//	public List<User> getAll() {
+//		List<User> users = repo.findAll();
+//		LocalDate today = LocalDate.now();
+//		for (User user : users) {
+//			LocalDate dob = user.getBirthday();
+//			Period p = Period.between(dob, today);
+//			user.setAge(p.getYears());
+//		}
+//		return users;
+//	}
+	
+//	@Autowired
+//	private NoOpPasswordEncoder passwordEncoder;
+	
+//	@Autowired
+//	private DemoServiceProxy proxy;
 
 }

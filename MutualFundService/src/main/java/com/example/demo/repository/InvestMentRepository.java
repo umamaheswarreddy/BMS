@@ -8,32 +8,20 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-
 import com.example.demo.entity.Investment;
-
 
 @Repository
 public interface InvestMentRepository extends JpaRepository<Investment, Integer> {
-	
-	
-	@Query(value = "SELECT * FROM Investment t where t.pan = :pan AND t.i_Id = :iId", nativeQuery = true)
-   Optional<Investment> findByPanANDIId(@Param("pan") String pan, @Param("iId") int iId);
 
-	List<Investment> findAllByPan(String pan);
-	
+//	@Query(value = "SELECT * FROM Investment t where t.pan = :pan AND t.i_Id = :iId", nativeQuery = true)
+//	Optional<Investment> findByPanANDIId(@Param("pan") String pan, @Param("iId") int iId);
+
+	Optional<List<Investment>> findAllByPan(String pan);
+
 	@Query(value = "SELECT * FROM Investment t WHERE t.pan=:pan AND t.mutual_fund_id=:MutualFundId", nativeQuery = true)
 	List<Investment> findAllByPanANDMutualFundId(@Param("pan") String pan, @Param("MutualFundId") int mutualFundId);
-	
-//    List<Investment> findAllByMutualFundId(@Param("MutualFundId") int MutualFundId);
-    
-	@Query(value = "select * from Investment  t where t.mutual_fund_id=:MutualFundId",nativeQuery = true)
+
+	@Query(value = "select * from Investment  t where t.mutual_fund_id=:MutualFundId", nativeQuery = true)
 	List<Investment> findAllByMutualFundId(@Param("MutualFundId") int mutualFundId);
 
-	
-//	@Query(value = "SELECT SUM(t.amount_to_invest) FROM Investment where pan = :pan")
-//	Integer sumByPan(@Param("pan") String pan);
-
-
-//	   @Query(value = "select SUM(amountToInvest) from  Investment t where t.account_number =:accountNumber",nativeQuery = true) 
-//	   Integer findSUMByACCOUNTNumber(@Param("accountNumber")String accountNumber);
 }

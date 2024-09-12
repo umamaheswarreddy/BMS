@@ -39,10 +39,10 @@ public class UserRegistrationApplication {
 		SpringApplication.run(UserRegistrationApplication.class, args);
 	}
 
-	@Bean
-	public RestTemplate restTemplate(RestTemplateBuilder builder) {
-		return builder.build();
-	}
+//	@Bean
+//	public RestTemplate restTemplate(RestTemplateBuilder builder) {
+//		return builder.build();
+//	}
 	@Bean
 	Docket configureSwagger() {
 		return new Docket(DocumentationType.SWAGGER_2)
