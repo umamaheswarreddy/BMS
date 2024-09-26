@@ -1,5 +1,6 @@
 package com.cts.service;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.stream.Collectors;
 
@@ -22,9 +23,8 @@ public class CustomUserDetails implements UserDetails {
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		
-		return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_" + role))
-				.collect(Collectors.toList());
-
+		SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
+		return Arrays.asList(authority);
 	}
 
 	

@@ -5,22 +5,45 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
+import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import io.swagger.annotations.ApiModel;
+import io.swagger.annotations.ApiModelProperty;
+
+@ApiModel(description = "This is the BankAccount entity")
 @Entity
 public class BankAccount {
 
+	@ApiModelProperty(value = "A unique key for each USER")
 	@Id
 	@GeneratedValue
 	private int bid;
-	@Column()
+	
+	@ApiModelProperty(value = "bankAccount of the user")
+	@Column(unique = true)
+	@NotNull(message = "bankAccount should not be null")
+	@Pattern(regexp = "(^[0-9]{10}$)",message = "bankAccount should contain 10 digits")
 	private String bankAccount;
+	
+	@ApiModelProperty(value = "ifscCode of the user")
+	@NotNull(message = "ifscCode name should not be null")
+	@Pattern(regexp = "^[A-Z]{4}0[A-Z0-9]{6}$",message = "ifscCode is an 11-digit alpha-numeric code used to uniquely identify bank.")
 	private String ifscCode;
-	@Pattern(regexp = "^[A-Za-z0-9]*$")
+	
+	@ApiModelProperty(value = "bankName of the user")
+	@NotNull(message = "bank name should not be null")
+	@Pattern(regexp = "(^[a-zA-Z]+$)",message = "bankName should be in alphabets")
 	private String bankName;
+	
+	@ApiModelProperty(value = "micrCode of the user")
+	@NotNull(message = "micrCode name should not be null")
+	@Pattern(regexp = "(^[0-9]{9}$)",message = "MICR code is a 9-digit code that uniquely identifies the bank and branch")
 	private String micrCode;
+	
+	@ApiModelProperty(value = "PAN of the user")
     @JsonIgnore
 	private String pan;
 	
